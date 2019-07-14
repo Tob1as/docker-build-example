@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Autobuild the Image on Docker Hub with advanced options
+# https://docs.docker.com/docker-hub/builds/advanced/
+
+set -e
+
+docker build \
+    --file "${DOCKERFILE_PATH}" \
+    --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+    --build-arg VCS_REF="$(git rev-parse --short HEAD)" \
+	#--build-arg CROSS_BUILD_START="cross-build-start" \
+	#--build-arg CROSS_BUILD_END="cross-build-end" \
+    --tag "$IMAGE_NAME" \
+    .
