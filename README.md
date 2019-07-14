@@ -14,7 +14,7 @@ Example for advanced options (hooks) for Autobuild on Docker Hub with ARM-Images
 
 ```
 .
-└── hooks
+├── hooks
     ├── post_checkout
     ├── pre_build
     ├── build     # optional
@@ -23,7 +23,7 @@ Example for advanced options (hooks) for Autobuild on Docker Hub with ARM-Images
 ├── alpine.armhf.v1_11.Dockerfile
 ├── alpine.x86_64.Dockerfile
 ├── debian.armhf.Dockerfile
-├── debian.x86_64.Dockerfile
+└── debian.x86_64.Dockerfile
 ```
 
 
