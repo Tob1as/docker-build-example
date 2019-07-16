@@ -1,6 +1,6 @@
 # Autobuild on Docker Hub
 
-Example for advanced options (hooks) for Autobuild on Docker Hub with ARM-Images!  
+**Example for advanced options (hooks) for Autobuild on Docker Hub with ARM-Images!**   
 
 A possible solution for:
 * [Support automated ARM builds](https://github.com/docker/hub-feedback/issues/1261)
