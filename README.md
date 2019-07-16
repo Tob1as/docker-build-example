@@ -7,6 +7,9 @@ A possible solution for:
 * [Automated multi-arch builds using manifest file](https://github.com/docker/hub-feedback/issues/1779)
 * [No way to specify arch in docker {run,pull,build}](https://github.com/moby/moby/issues/36552)
 
+ToDo:
+* [Override Architecture in the resulting image](https://github.com/moby/buildkit/issues/913#issuecomment-478302731) (--platform=$TARGETPLATFORM), required Docker 19.03.
+
 ## Information
 
 You can use the [example here](https://github.com/Tob1asDocker/dockerhubhooksexample) from me or also [another possibility](https://github.com/rmoriz/multiarch-test).  
