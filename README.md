@@ -4,10 +4,12 @@ Example for advanced options (hooks) for Autobuild on Docker Hub with ARM-Images
 
 ## Information
 
+You can use the [example here](https://github.com/Tob1asDocker/dockerhubhooksexample) from me or also [another possibility](https://github.com/rmoriz/multiarch-test).  
+
+Details to build:  
 * [Advanced options for Autobuild](https://docs.docker.com/docker-hub/builds/advanced/) inspired by [https://stackoverflow.com/a/54595564](https://stackoverflow.com/questions/54578066/how-to-build-a-docker-image-on-a-specific-architecture-with-docker-hub/54595564#54595564).
 * additional software/tools used: [qemu-user-static from multiarch](https://github.com/multiarch/qemu-user-static) and [manifest-tool](https://github.com/estesp/manifest-tool). Thanks for the great things!
-
-* Base-Images: [balena.io Base-Images](https://www.balena.io/docs/reference/base-images/base-images/) and [official Images](https://github.com/docker-library/official-images#architectures-other-than-amd64).
+* Base-Images: [balena.io Base-Images](https://www.balena.io/docs/reference/base-images/base-images/) and/or [official Images](https://github.com/docker-library/official-images#architectures-other-than-amd64).
 
 
 ## Project tree
@@ -19,8 +21,8 @@ Example for advanced options (hooks) for Autobuild on Docker Hub with ARM-Images
     ├── pre_build
     ├── build     # optional
     └── post_push
-├── alpine.armhf.Dockerfile
 ├── alpine.armhf.v1_11.Dockerfile
+├── alpine.armhf.Dockerfile
 ├── alpine.x86_64.Dockerfile
 ├── debian.armhf.Dockerfile
 └── debian.x86_64.Dockerfile

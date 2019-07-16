@@ -5,7 +5,7 @@
 
 # check host and build architecture; if needed, download latest qemu-user-static and add optional to the Dockerfile.
 
-set -e
+set -ex
 
 HOST_ARCH=$(uname -m)
 BUILD_ARCH=$(echo "${DOCKERFILE_PATH}" | cut -d '.' -f 2)

@@ -3,9 +3,9 @@
 # Autobuild the Image on Docker Hub with advanced options
 # https://docs.docker.com/docker-hub/builds/advanced/
 
-# if the host is not equal to the building system architecture, set the image arch with manifest correctly on docker hub.
+# if the host is not equal to the building system architecture, set the image arch with manifest on docker hub.
 
-set -e
+set -ex
 
 #IMAGE_OS=$(uname | tr '[:upper:]' '[:lower:]')
 IMAGE_OS="linux"
@@ -25,7 +25,7 @@ else
     # Manifest
 
     # docker manifest: https://docs.docker.com/engine/reference/commandline/manifest/
-    echo "docker manifest (not working with autobuild on docker hub)"
+    echo "docker manifest is an experimental feature and not enabled by default for autobuilds on docker hub. You can enable it in ~/.docker/config.json for Docker CLI."
     #docker manifest create "${IMAGE_NAME}" "${IMAGE_NAME}"
     #docker manifest annotate "${IMAGE_NAME}" "${IMAGE_NAME}" --os "${IMAGE_OS}" --arch "${QEMU_USER_STATIC_ARCH}"
     #docker manifest push "${IMAGE_NAME}"

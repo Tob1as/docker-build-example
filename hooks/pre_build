@@ -5,7 +5,7 @@
 
 # if the host is not equal to the building system architecture, register qemu-*-static.
 
-set -e
+set -ex
 
 HOST_ARCH=$(uname -m)
 BUILD_ARCH=$(echo "${DOCKERFILE_PATH}" | cut -d '.' -f 2)

@@ -3,7 +3,11 @@
 # Autobuild the Image on Docker Hub with advanced options
 # https://docs.docker.com/docker-hub/builds/advanced/
 
-set -e
+# docker build with arguments
+
+# Instead of $IMAGE_NAME you can also use ${DOCKER_REPO}:${DOCKER_TAG}
+
+set -ex
 
 docker build \
     --file "${DOCKERFILE_PATH}" \
