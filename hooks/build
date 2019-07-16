@@ -13,7 +13,7 @@ docker build \
     --file "${DOCKERFILE_PATH}" \
     --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
     --build-arg VCS_REF="$(git rev-parse --short HEAD)" \
-	#--build-arg CROSS_BUILD_START="cross-build-start" \
-	#--build-arg CROSS_BUILD_END="cross-build-end" \
+    #--build-arg CROSS_BUILD_START="cross-build-start" \
+    #--build-arg CROSS_BUILD_END="cross-build-end" \
     --tag "$IMAGE_NAME" \
     .
