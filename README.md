@@ -12,7 +12,7 @@ ToDo:
 
 ## Information
 
-You can use the [example here](https://github.com/Tob1asDocker/dockerhubhooksexample) from me or also [another possibility](https://github.com/rmoriz/multiarch-test).  
+You can use the [example here](https://github.com/Tob1asDocker/dockerhubhooksexample) from me or other [rmoriz/multiarch-test](https://github.com/rmoriz/multiarch-test), [jnovack/docker-multi-arch-hooks](https://github.com/jnovack/docker-multi-arch-hooks).  
 
 Details to build:  
 * [Advanced options for Autobuild](https://docs.docker.com/docker-hub/builds/advanced/) inspired by [https://stackoverflow.com/a/54595564](https://stackoverflow.com/questions/54578066/how-to-build-a-docker-image-on-a-specific-architecture-with-docker-hub/54595564#54595564).
