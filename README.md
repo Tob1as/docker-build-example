@@ -1,43 +1,30 @@
 # Autobuild on Docker Hub
 
-**Example for advanced options (hooks) for Autobuild on Docker Hub with ARM-Images!**   
-
-A possible solution for:
-* [Support automated ARM builds](https://github.com/docker/hub-feedback/issues/1261)
-* [Automated multi-arch builds using manifest file](https://github.com/docker/hub-feedback/issues/1779)
-* [No way to specify arch in docker {run,pull,build}](https://github.com/moby/moby/issues/36552)
-
-ToDo:
-* [Override Architecture in the resulting image](https://github.com/moby/buildkit/issues/913#issuecomment-478302731) (--platform=$TARGETPLATFORM), required Docker 19.03.
+**Example for advanced options (hooks) and buildx for Autobuild on Docker Hub to build Multiarch Images (x86_64 and ARM)**
 
 ## Information
 
-You can use the [example here](https://github.com/Tob1asDocker/dockerhubhooksexample) from me or other [rmoriz/multiarch-test](https://github.com/rmoriz/multiarch-test), [jnovack/docker-multi-arch-hooks](https://github.com/jnovack/docker-multi-arch-hooks).  
+With buildx you can build multiarch Images on Docker Hub from a GitHub/Bitbucket Repository.
 
-Details to build:  
-* [Advanced options for Autobuild](https://docs.docker.com/docker-hub/builds/advanced/) inspired by [https://stackoverflow.com/a/54595564](https://stackoverflow.com/questions/54578066/how-to-build-a-docker-image-on-a-specific-architecture-with-docker-hub/54595564#54595564).
-* additional software/tools used: [qemu-user-static from multiarch](https://github.com/multiarch/qemu-user-static) and [manifest-tool](https://github.com/estesp/manifest-tool). Thanks for the great things!
-* Base-Images: [balena.io Base-Images](https://www.balena.io/docs/reference/base-images/base-images/) and/or [official Images](https://github.com/docker-library/official-images#architectures-other-than-amd64).
-
+More Details:  
+* [Advanced options for Autobuild](https://docs.docker.com/docker-hub/builds/advanced/)
+* [buildx](https://docs.docker.com/buildx/working-with-buildx/)
+* [Building Multi-Architecture Docker Images With Buildx](https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with-buildx-27d80f7e2408)
+* [Custom Registry Cert for local build](https://github.com/docker/buildx/issues/80)
+* [qemu-user-static by multiarch](https://github.com/multiarch/qemu-user-static) 
 
 ## Project tree
 
 ```
 .
 ├── hooks
-    ├── post_checkout
     ├── pre_build
-    ├── build     # optional
-    └── post_push
-├── alpine.armhf.v1_11.Dockerfile
-├── alpine.armhf.Dockerfile
-├── alpine.x86_64.Dockerfile
-├── debian.armhf.Dockerfile
-└── debian.x86_64.Dockerfile
+    ├── build
+    └── push
+├── Dockerfile
+└── ... more Dockerfiles
 ```
 
+## Example Images
 
-## Examples
-
-* only ARM: [rpi-nginx](https://github.com/Tob1asDocker/rpi-nginx)
-* ARM and x86_64: [alpine-nginx-php](https://github.com/Tob1asDocker/alpine-nginx-php)
+* [tobi312/minio](https://github.com/Tob1asDocker/minio)
