@@ -25,6 +25,12 @@ More Details:
 └── ... more Dockerfiles
 ```
 
+## Alternative
+
+* for GitHub use the [official Docker Actions](https://github.com/marketplace/actions/docker-setup-buildx)
+* for GitLab use the `.gitlab-ci.yml` as an example, then hooks/ is not needed.
+
 ## Example Images
 
 * [tobi312/minio](https://github.com/Tob1asDocker/minio)
+* [tobi312/tools](https://github.com/Tob1asDocker/tools)
