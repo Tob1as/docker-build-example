@@ -27,7 +27,7 @@ More Details:
 
 ## Alternative
 
-* for GitHub use the [official Docker Actions](https://github.com/marketplace/actions/docker-setup-buildx)
+* for GitHub use the [official Docker Actions (build-push-action)](https://github.com/docker/build-push-action) and setup-buildx-action, setup-qemu-action.
 * for GitLab use the `.gitlab-ci.yml` as an example, then hooks/ is not needed.
 
 ## Example Images
