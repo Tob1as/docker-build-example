@@ -27,8 +27,14 @@ More Details:
 
 ## Alternative
 
-* for GitHub use the [official Docker Actions (build-push-action)](https://github.com/docker/build-push-action) and setup-buildx-action, setup-qemu-action.
-* for GitLab use the `.gitlab-ci.yml` as an example, then hooks/ is not needed.
+* for GitHub use the GitHub Actions (`.github/workflows/build_docker_images.yaml`):
+  * [checkout](https://github.com/actions/checkout)
+  * [setup-qemu-action](https://github.com/docker/setup-qemu-action)
+  * [setup-buildx-action](https://github.com/docker/setup-buildx-action)
+  * [login-action](https://github.com/docker/login-action)
+  * [build-push-action](https://github.com/docker/build-push-action)
+  * https://docs.github.com/en/actions/learn-github-actions/environment-variables
+* for GitLab use the `.gitlab-ci.yml` as an example, then `hooks/` is not needed.
 
 ## Example Images
 
