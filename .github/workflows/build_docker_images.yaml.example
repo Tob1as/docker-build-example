@@ -110,7 +110,7 @@ jobs:
           #  quay.io/${{steps.script.outputs.redhat_quay_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}
           #  quay.io/${{steps.script.outputs.redhat_quay_repo}}:latest
 
-      ## Note: Docker Hub Personal Access Tokens cannot be used as they are not supported by the API.
+      ## Docker Hub Access Token problem: https://github.com/peter-evans/dockerhub-description/issues/10
       #- name: Docker Hub Description
       #  uses: peter-evans/dockerhub-description@v2
       #  with:
