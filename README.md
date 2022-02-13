@@ -34,6 +34,7 @@ More Details:
   * [login-action](https://github.com/docker/login-action)
   * [build-push-action](https://github.com/docker/build-push-action)
   * https://docs.github.com/en/actions/learn-github-actions/environment-variables
+  * [dockerhub-description](https://github.com/peter-evans/dockerhub-description)
 * for GitLab use the `.gitlab-ci.yml` as an example, then `hooks/` is not needed.
 
 ## Example Images

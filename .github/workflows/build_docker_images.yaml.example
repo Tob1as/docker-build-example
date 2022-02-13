@@ -16,6 +16,9 @@ on:
     branches:
       - 'main'
       - 'master'
+  #  paths:
+  #    - 'Dockerfile'
+  #    - '.github/workflows/build_docker_images.yaml'
   workflow_dispatch:
   schedule:
     - cron: '30 5 28 * *'  # At 05:30 on day-of-month 28.
@@ -30,6 +33,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        #with:
+        #  submodules: true
 
       - name: Shell-Script
         id: script
@@ -84,6 +89,8 @@ jobs:
 
       - name: Build
         uses: docker/build-push-action@v2
+        env:
+          APP_VERSION: 1.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
@@ -92,6 +99,7 @@ jobs:
           pull: true
           push: true
           build-args: |
+            APP_VERSION=${{ env.APP_VERSION }}
             BUILD_DATE=${{steps.script.outputs.build_date}}
             VCS_REF=${{steps.script.outputs.commit_hash}}
           tags: |
@@ -101,3 +109,13 @@ jobs:
             docker.io/${{steps.script.outputs.docker_repo}}:latest
           #  quay.io/${{steps.script.outputs.redhat_quay_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}
           #  quay.io/${{steps.script.outputs.redhat_quay_repo}}:latest
+
+      ## Note: Docker Hub Personal Access Tokens cannot be used as they are not supported by the API.
+      #- name: Docker Hub Description
+      #  uses: peter-evans/dockerhub-description@v2
+      #  with:
+      #    username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #    password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      #    repository: ${{steps.script.outputs.docker_repo}}
+      #    short-description: ${{ github.event.repository.description }}
+      #    readme-filepath: README.md
