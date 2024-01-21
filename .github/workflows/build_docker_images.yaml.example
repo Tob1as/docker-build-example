@@ -1,24 +1,25 @@
-# GitHub Action for Multiarch Docker Images
-# https://github.com/Tob1asDocker/dockerhubhooksexample
-# Documentation:
-# https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-output-parameter
-# https://github.com/actions/checkout
-# https://github.com/docker/login-action
-# https://github.com/docker/setup-qemu-action
-# https://github.com/docker/setup-buildx-action
-# https://github.com/docker/build-push-action
-# https://github.com/peter-evans/dockerhub-description
-# Tutorial/Example: 
-# https://blog.oddbit.com/post/2020-09-25-building-multi-architecture-im/ 
-# https://github.com/metcalfc/docker-action-examples
+# GitHub Actions Example for Multiarch Docker Images
+# Source: https://github.com/Tob1as/docker-build-example
 
-name: 'build docker images'
+# Documentation:
+# * GitHub: https://docs.github.com/en/actions             (.github/workflows/*.yaml)
+# * Gitea: https://docs.gitea.com/usage/actions/overview   (.gitea/workflows/*.yaml)
+# * Forgejo: https://forgejo.org/docs/latest/user/actions/ (.forgejo/workflows/*.yaml)
+# Actions:
+# * https://github.com/actions/checkout
+# * https://github.com/docker/login-action
+# * https://github.com/docker/setup-qemu-action
+# * https://github.com/docker/setup-buildx-action
+# * https://github.com/docker/build-push-action
+# * https://github.com/peter-evans/dockerhub-description
+
+name: 'build docker images: example'
 
 on:
   push:
-    branches:
-      - 'main'
-      - 'master'
+  #  branches:
+  #    - 'main'
+  #    - 'master'
   #  paths:
   #    - 'Dockerfile'
   #    - '.github/workflows/build_docker_images.yaml'
@@ -35,9 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-        #with:
-        #  submodules: true
+        uses: actions/checkout@v4
 
       - name: Shell-Script
         id: script
@@ -45,79 +44,113 @@ jobs:
           BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           BUILD_DATE_NUMERIC="${BUILD_DATE//[^[:digit:]]/}"
           COMMIT_HASH=${GITHUB_SHA::8}
-          GITHUB_REPO=${GITHUB_REPOSITORY,,}
-          GITHUB_REPO_SHORT=${GITHUB_REPO#*/}
-          DOCKER_REPO=${{ secrets.DOCKER_USERNAME }}/${GITHUB_REPO_SHORT}
-          #REDHAT_QUAY_REPO=${{ secrets.REDHAT_QUAY_USERNAME }}/${GITHUB_REPO_SHORT}
+          GIT_URL=$(echo "${GITHUB_SERVER_URL}" | awk -F/ '{print $3}' | sed 's/\/*$//')
+          GIT_URL=$(echo "$GIT_URL" | sed 's/github\.com/ghcr\.io/g')   # GIT_URL switch to ghcr.io registry for GitHub
+          GIT_REPO=${GITHUB_REPOSITORY,,}
+          GIT_REPO_SHORT=${GIT_REPO#*/}
+          GIT_REPO_SHORT=${GIT_REPO_SHORT#"docker-"}
+          DOCKER_REPO=${{ secrets.DOCKER_USERNAME }}/${GIT_REPO_SHORT}
+          REDHAT_QUAY_REPO=${{ secrets.REDHAT_QUAY_USERNAME }}/${GITHUB_REPO_SHORT}
+
+          echo "ENVs: BUILD_DATE=${BUILD_DATE}, BUILD_DATE_NUMERIC=${BUILD_DATE_NUMERIC}, COMMIT_HASH=${COMMIT_HASH}, GIT_URL=${GIT_URL}, GIT_REPO=${GIT_REPO}"
+          #echo "ENVs (by Git) for Owner: GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} and github.repository_owner=${{ github.repository_owner }} are the same!"
           
-          # Set output parameters to GitHub action.
-          echo ::set-output name=build_date::${BUILD_DATE}
-          echo ::set-output name=build_date_numeric::${BUILD_DATE_NUMERIC}
-          echo ::set-output name=commit_hash::${COMMIT_HASH}
-          echo ::set-output name=github_repo::${GITHUB_REPO}
-          echo ::set-output name=docker_repo::${DOCKER_REPO}
-          #echo ::set-output name=redhat_quay_repo::${REDHAT_QUAY_REPO}
+          # Set output parameters to action.
+          echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
+          echo "build_date_numeric=${BUILD_DATE_NUMERIC}" >> "$GITHUB_OUTPUT"
+          echo "commit_hash=${COMMIT_HASH}" >> "$GITHUB_OUTPUT"
+          echo "git_url=${GIT_URL}" >> "$GITHUB_OUTPUT"
+          echo "git_repo=${GIT_REPO}" >> "$GITHUB_OUTPUT"
+          echo "docker_repo=${DOCKER_REPO}" >> "$GITHUB_OUTPUT"
+          echo "redhat_quay_repo=${REDHAT_QUAY_REPO}" >> "$GITHUB_OUTPUT"
+          
+          # TOKEN workarround for Gitea/Forgejo
+          if [[ $GIT_URL == "github.com" || $GIT_URL == "ghcr.io" ]]; then GIT_REGISTRY_TOKEN="${{ secrets.GITHUB_TOKEN }}"; else GIT_REGISTRY_TOKEN="${{ secrets.GIT_USER_PASSWD }}"; fi
+          echo "git_registry_token=${GIT_REGISTRY_TOKEN}" >> "$GITHUB_OUTPUT"
+          # add "GIT_USER_PASSWD" to Settings->Actions->Secrets in Repository,
+          # because ${{ secrets.GITHUB_TOKEN }}, ${GITHUB_TOKEN}, ${{ github.token }} or ${{ env.GITHUB_TOKEN }} not working :-(
+          # see: https://github.com/go-gitea/gitea/issues/23642 for ${{ secrets.GITEA_TOKEN}} and other.
+
+      #- name: Shell-Script-echo-outputs
+      #  id: script-echo
+      #  run: |
+      #    echo ${{steps.script.outputs.build_date}}
+      #    echo ${{steps.script.outputs.build_date_numeric}}
+      #    echo ${{steps.script.outputs.commit_hash}}
+      #    echo ${{steps.script.outputs.git_url}}
+      #    echo ${{steps.script.outputs.git_repo}}
+      #    echo ${{steps.script.outputs.docker_repo}}
+
+      - name: Install Docker
+        run: |
+          if ! command -v docker &> /dev/null; then
+            curl -fsSL https://get.docker.com | sh
+          else
+            echo "skip -> Docker is already installed!"
+          fi
 
       - name: Set up QEMU
         id: qemu
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
         with:
           image: tonistiigi/binfmt:latest
           platforms: all
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
-          registry: ghcr.io
+          config-inline: |
+            [registry."${{steps.script.outputs.git_url}}"]
+              #insecure = true
+              ca=["/etc/ssl/certs/ca-certificates.crt"]            
+
+      - name: Login to GIT Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ steps.script.outputs.git_url }}
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ steps.script.outputs.git_registry_token }} # ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to DockerHub 
-        uses: docker/login-action@v2
-        with:
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      #- name: Login to DockerHub Container Registry
+      #  uses: docker/login-action@v3
+      #  with:
+      #    registry: docker.io
+      #    username: ${{ secrets.DOCKER_USERNAME }}
+      #    password: ${{ secrets.DOCKER_PASSWORD }}
 
       #- name: Login to RED HAT Quay.io Container Registry
-      #  uses: docker/login-action@v2
+      #  uses: docker/login-action@v1
       #  with:
       #    registry: quay.io
       #    username: ${{ secrets.REDHAT_QUAY_USERNAME }}
       #    password: ${{ secrets.REDHAT_QUAY_PASSWORD }}
 
       - name: Build
-        uses: docker/build-push-action@v3
-        env:
-          APP_VERSION: 1.0.0
+        uses: docker/build-push-action@v5
+        #env:
+        #  APP_VERSION: 1.0.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7
-          pull: true
+          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7,linux/arm/v6
           push: true
           build-args: |
-            APP_VERSION=${{ env.APP_VERSION }}
             BUILD_DATE=${{steps.script.outputs.build_date}}
             VCS_REF=${{steps.script.outputs.commit_hash}}
+          #  APP_VERSION=${{ env.APP_VERSION }}
           tags: |
-            ghcr.io/${{steps.script.outputs.github_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}
-            ghcr.io/${{steps.script.outputs.github_repo}}:latest
-            docker.io/${{steps.script.outputs.docker_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}
-            docker.io/${{steps.script.outputs.docker_repo}}:latest
-          #  quay.io/${{steps.script.outputs.redhat_quay_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}
-          #  quay.io/${{steps.script.outputs.redhat_quay_repo}}:latest
+            ${{steps.script.outputs.git_url}}/${{steps.script.outputs.git_repo}}:latest
+            ${{steps.script.outputs.git_url}}/${{steps.script.outputs.git_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}            
+         #   docker.io/${{steps.script.outputs.docker_repo}}:latest
+         #   quay.io/${{steps.script.outputs.redhat_quay_repo}}:latest
 
-      - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{steps.script.outputs.docker_repo}}
-          short-description: ${{ github.event.repository.description }}
-          readme-filepath: README.md
+      #- name: Docker Hub Description
+      #  uses: peter-evans/dockerhub-description@v3
+      #  with:
+      #    username: ${{ secrets.DOCKER_USERNAME }}
+      #    password: ${{ secrets.DOCKER_PASSWORD }}
+      #    repository: ${{steps.script.outputs.docker_repo}}
+      #    short-description: ${{ github.event.repository.description }}
+      #    readme-filepath: README.md
