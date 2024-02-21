@@ -145,6 +145,7 @@ jobs:
             ${{steps.script.outputs.git_url}}/${{steps.script.outputs.git_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}            
          #   docker.io/${{steps.script.outputs.docker_repo}}:latest
          #   quay.io/${{steps.script.outputs.redhat_quay_repo}}:latest
+         # outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=My multi-arch image
 
       #- name: Docker Hub Description
       #  uses: peter-evans/dockerhub-description@v3
