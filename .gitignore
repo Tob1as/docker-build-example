@@ -1,3 +1,5 @@
 # https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 .idea/
 *.iml
+# VSCode
+.vscode
