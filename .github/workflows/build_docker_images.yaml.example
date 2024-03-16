@@ -50,7 +50,7 @@ jobs:
           GIT_REPO_SHORT=${GIT_REPO#*/}
           GIT_REPO_SHORT=${GIT_REPO_SHORT#"docker-"}
           DOCKER_REPO=${{ secrets.DOCKER_USERNAME }}/${GIT_REPO_SHORT}
-          REDHAT_QUAY_REPO=${{ secrets.REDHAT_QUAY_USERNAME }}/${GITHUB_REPO_SHORT}
+          REDHAT_QUAY_REPO=${{ secrets.REDHAT_QUAY_USERNAME }}/${GIT_REPO_SHORT}
 
           echo "ENVs: BUILD_DATE=${BUILD_DATE}, BUILD_DATE_NUMERIC=${BUILD_DATE_NUMERIC}, COMMIT_HASH=${COMMIT_HASH}, GIT_URL=${GIT_URL}, GIT_REPO=${GIT_REPO}"
           #echo "ENVs (by Git) for Owner: GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} and github.repository_owner=${{ github.repository_owner }} are the same!"
