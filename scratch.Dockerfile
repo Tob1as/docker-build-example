@@ -11,26 +11,26 @@ COPY <<EOF main.go
 package main
 
 import (
-	"flag"
-	"fmt"
+    "flag"
+    "fmt"
     "log"
-	"net/http"
+    "net/http"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello :-)")
+    fmt.Fprintln(w, "Hello :-)")
 }
 
 func main() {
-	port := flag.String("port", "8080", "Port on which the server is running")
-	flag.Parse() // Flags parsen
+    port := flag.String("port", "8080", "Port on which the server is running")
+    flag.Parse() // Flags parsen
 
-	http.HandleFunc("/", handler)
+    http.HandleFunc("/", handler)
 
-	log.Printf("Server is running: http://0.0.0.0:%s", *port)
-	if err := http.ListenAndServe(":"+*port, nil); err != nil {
-		log.Printf("Error:", err)
-	}
+    log.Printf("Server is running: http://0.0.0.0:%s", *port)
+    if err := http.ListenAndServe(":"+*port, nil); err != nil {
+        log.Printf("Error:", err)
+    }
 }
 EOF
 
