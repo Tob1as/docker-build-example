@@ -1,4 +1,4 @@
-# docker build --no-cache --progress=plain -t local/example:scratch -f scratch.Dockerfile .
+# docker build --no-cache --progress=plain -t local/example:debian -f debian.Dockerfile .
 
 # hadolint ignore=DL3006
 FROM golang:latest AS builder
@@ -44,11 +44,13 @@ RUN \
 
 
 # hadolint ignore=DL3006
-FROM scratch AS production
+FROM debian:latest AS production
 
 ARG VCS_REF
 ARG BUILD_DATE
 ARG VERSION
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 LABEL org.opencontainers.image.title="" \
       org.opencontainers.image.authors="" \
@@ -58,22 +60,29 @@ LABEL org.opencontainers.image.title="" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.description="" \
       org.opencontainers.image.documentation="" \
-      org.opencontainers.image.base.name="scratch" \
+      org.opencontainers.image.base.name="docker.io/library/debian:latest" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.url="" \
       org.opencontainers.image.source="https://github.com/Tob1as/docker-build-example"
 
-# Copy static curl
-COPY --from=docker.io/tobi312/tools:static-curl /usr/bin/curl /usr/bin/curl
+RUN set -eux ; \
+    apt-get update ; \
+    apt-get install -y --no-install-recommends \
+        curl \
+        netcat-openbsd \
+    ; \
+    rm -rf /var/lib/apt/lists/* ; \
+    echo "Install packages done!"
 
 # Copy files from your build
 COPY --from=builder --chown=1000:100 /go/app/webserver /app/webserver
 
-USER 1000
+USER nobody
 
 EXPOSE 8080/tcp
 ENTRYPOINT ["/app/webserver"]
 CMD ["--port=8080"]
 
-# healthcheck without shell: https://stackoverflow.com/a/77075724  (check with: docker inspect --format='{{json .State.Health}}' <container-id>)
-HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["/usr/bin/curl", "-f", "http://localhost:8080"]
+# healthcheck (check with: docker inspect --format='{{json .State.Health}}' <container-id>)
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD /usr/bin/curl -f http://localhost:8080 || exit 1
+#HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD /usr/bin/nc -z -w1 localhost 8080 || exit 1

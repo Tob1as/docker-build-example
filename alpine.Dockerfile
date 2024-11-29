@@ -1,4 +1,4 @@
-# docker build --no-cache --progress=plain -t local/example:scratch -f scratch.Dockerfile .
+# docker build --no-cache --progress=plain -t local/example:alpine -f alpine.Dockerfile .
 
 # hadolint ignore=DL3006
 FROM golang:latest AS builder
@@ -44,7 +44,7 @@ RUN \
 
 
 # hadolint ignore=DL3006
-FROM scratch AS production
+FROM alpine:latest AS production
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -58,22 +58,27 @@ LABEL org.opencontainers.image.title="" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.description="" \
       org.opencontainers.image.documentation="" \
-      org.opencontainers.image.base.name="scratch" \
+      org.opencontainers.image.base.name="docker.io/library/alpine:latest" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.url="" \
       org.opencontainers.image.source="https://github.com/Tob1as/docker-build-example"
 
-# Copy static curl
-COPY --from=docker.io/tobi312/tools:static-curl /usr/bin/curl /usr/bin/curl
+RUN set -eux ; \
+    apk add --no-cache \
+        curl \
+        netcat-openbsd \
+    ; \
+    echo "Install packages done!"
 
 # Copy files from your build
 COPY --from=builder --chown=1000:100 /go/app/webserver /app/webserver
 
-USER 1000
+USER nobody
 
 EXPOSE 8080/tcp
 ENTRYPOINT ["/app/webserver"]
 CMD ["--port=8080"]
 
-# healthcheck without shell: https://stackoverflow.com/a/77075724  (check with: docker inspect --format='{{json .State.Health}}' <container-id>)
-HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["/usr/bin/curl", "-f", "http://localhost:8080"]
+# healthcheck (check with: docker inspect --format='{{json .State.Health}}' <container-id>)
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD /usr/bin/curl -f http://localhost:8080 || exit 1
+#HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD /usr/bin/nc -z -w1 localhost 8080 || exit 1
