@@ -67,6 +67,7 @@ RUN \
         grep -v "^PreDepends:" | \
         sort -u; \
     done | sort -u) && \
+    #packages=$PACKAGE_LIST ; \
     # Download packages
     echo ">> Packages to Download: $(echo $packages | tr '\n' ' ')" && \
     apt-get download \
