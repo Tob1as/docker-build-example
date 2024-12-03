@@ -1,6 +1,6 @@
 # docker build --no-cache --progress=plain -t local/example:distroless -f distroless.debian.Dockerfile .
 
-# hadolint ignore=DL3006
+# hadolint ignore=DL3006,DL3007
 FROM golang:latest AS builder
 
 ENV CGO_ENABLED=0
@@ -101,7 +101,7 @@ RUN tree /dpkg
 
 
 # We want latest at time of build
-# hadolint ignore=DL3006
+# hadolint ignore=DL3006,DL3007
 FROM gcr.io/distroless/static-debian12:latest AS production
 
 ARG VCS_REF

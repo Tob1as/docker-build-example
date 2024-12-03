@@ -1,6 +1,6 @@
 # docker build --no-cache --progress=plain -t local/example:alpine -f alpine.Dockerfile .
 
-# hadolint ignore=DL3006
+# hadolint ignore=DL3006,DL3007
 FROM golang:latest AS builder
 
 ENV CGO_ENABLED=0
@@ -51,7 +51,7 @@ RUN \
 
 
 
-# hadolint ignore=DL3006
+# hadolint ignore=DL3006,DL3007
 FROM alpine:latest AS production
 
 ARG VCS_REF
