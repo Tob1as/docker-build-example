@@ -82,6 +82,11 @@ jobs:
       #    echo ${{steps.script.outputs.git_repo}}
       #    echo ${{steps.script.outputs.docker_repo}}
 
+      #- name: hadolint
+      #  uses: hadolint/hadolint-action@master
+      #  with:
+      #    dockerfile: ./Dockerfile
+
       - name: Install Docker
         run: |
           if ! command -v docker &> /dev/null; then
