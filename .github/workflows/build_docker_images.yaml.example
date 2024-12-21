@@ -40,11 +40,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Shell-Script
+        shell: bash
         id: script
         run: |
           BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           BUILD_DATE_NUMERIC="${BUILD_DATE//[^[:digit:]]/}"
-          COMMIT_HASH=${GITHUB_SHA::8}
+          COMMIT_HASH=${GITHUB_SHA::7}
           GIT_URL=$(echo "${GITHUB_SERVER_URL}" | awk -F/ '{print $3}' | sed 's/\/*$//')
           GIT_URL=$(echo "$GIT_URL" | sed 's/github\.com/ghcr\.io/g')   # GIT_URL switch to ghcr.io registry for GitHub
           GIT_REPO=${GITHUB_REPOSITORY,,}
