@@ -152,6 +152,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/riscv64,linux/s390x,linux/386
           push: true
+          #target: production
           build-args: |
             BUILD_DATE=${{steps.script.outputs.build_date}}
             VCS_REF=${{steps.script.outputs.commit_hash}}
