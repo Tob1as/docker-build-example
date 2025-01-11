@@ -12,6 +12,7 @@
 # * https://github.com/docker/setup-qemu-action
 # * https://github.com/docker/setup-buildx-action
 # * https://github.com/docker/build-push-action
+# * https://github.com/hadolint/hadolint-action
 # * https://github.com/peter-evans/dockerhub-description
 
 name: 'build docker images: example'
@@ -25,8 +26,8 @@ on:
   #    - 'Dockerfile'
   #    - '.github/workflows/build_docker_images.yaml'
   workflow_dispatch:
-  schedule:
-    - cron: '30 5 28 * *'  # At 05:30 on day-of-month 28.
+  #schedule:
+  #  - cron: '30 5 28 * *'  # At 05:30 on day-of-month 28.
 
 defaults:
   run:
@@ -45,6 +46,7 @@ jobs:
         run: |
           BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           BUILD_DATE_NUMERIC="${BUILD_DATE//[^[:digit:]]/}"
+          #COMMIT_HASH=$(git rev-parse --short "$GITHUB_SHA")
           COMMIT_HASH=${GITHUB_SHA::7}
           GIT_URL=$(echo "${GITHUB_SERVER_URL}" | awk -F/ '{print $3}' | sed 's/\/*$//')
           GIT_URL=$(echo "$GIT_URL" | sed 's/github\.com/ghcr\.io/g')   # GIT_URL switch to ghcr.io registry for GitHub
@@ -57,7 +59,7 @@ jobs:
           echo "ENVs: BUILD_DATE=${BUILD_DATE}, BUILD_DATE_NUMERIC=${BUILD_DATE_NUMERIC}, COMMIT_HASH=${COMMIT_HASH}, GIT_URL=${GIT_URL}, GIT_REPO=${GIT_REPO}"
           #echo "ENVs (by Git) for Owner: GITHUB_REPOSITORY_OWNER=${GITHUB_REPOSITORY_OWNER} and github.repository_owner=${{ github.repository_owner }} are the same!"
           
-          # Set output parameters to action.
+          # Set output to action <https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/passing-information-between-jobs>
           echo "build_date=${BUILD_DATE}" >> "$GITHUB_OUTPUT"
           echo "build_date_numeric=${BUILD_DATE_NUMERIC}" >> "$GITHUB_OUTPUT"
           echo "commit_hash=${COMMIT_HASH}" >> "$GITHUB_OUTPUT"
@@ -65,7 +67,10 @@ jobs:
           echo "git_repo=${GIT_REPO}" >> "$GITHUB_OUTPUT"
           echo "docker_repo=${DOCKER_REPO}" >> "$GITHUB_OUTPUT"
           echo "redhat_quay_repo=${REDHAT_QUAY_REPO}" >> "$GITHUB_OUTPUT"
-          
+
+          # Set ENVs to action <https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#using-the-env-context-to-access-environment-variable-values>
+          echo "commit_hash=${COMMIT_HASH}" >> "$GITHUB_ENV"
+
           # TOKEN workarround for Gitea/Forgejo
           if [[ $GIT_URL == "github.com" || $GIT_URL == "ghcr.io" ]]; then GIT_REGISTRY_TOKEN="${{ secrets.GITHUB_TOKEN }}"; else GIT_REGISTRY_TOKEN="${{ secrets.GIT_USER_PASSWD }}"; fi
           echo "git_registry_token=${GIT_REGISTRY_TOKEN}" >> "$GITHUB_OUTPUT"
@@ -76,12 +81,16 @@ jobs:
       #- name: Shell-Script-echo-outputs
       #  id: script-echo
       #  run: |
+      #    echo ">> GITHUB_OUTPUT"
       #    echo ${{steps.script.outputs.build_date}}
       #    echo ${{steps.script.outputs.build_date_numeric}}
       #    echo ${{steps.script.outputs.commit_hash}}
       #    echo ${{steps.script.outputs.git_url}}
       #    echo ${{steps.script.outputs.git_repo}}
       #    echo ${{steps.script.outputs.docker_repo}}
+      #    echo ">> GITHUB_ENV"
+      #    echo "${{ env.commit_hash }}"
+      #    echo "$commit_hash"
 
       #- name: hadolint
       #  uses: hadolint/hadolint-action@master
@@ -141,7 +150,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64/v8,linux/arm/v7,linux/arm/v6
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/ppc64le,linux/riscv64,linux/s390x,linux/386
           push: true
           build-args: |
             BUILD_DATE=${{steps.script.outputs.build_date}}
@@ -149,7 +158,7 @@ jobs:
           #  APP_VERSION=${{ env.APP_VERSION }}
           tags: |
             ${{steps.script.outputs.git_url}}/${{steps.script.outputs.git_repo}}:latest
-            ${{steps.script.outputs.git_url}}/${{steps.script.outputs.git_repo}}:${{steps.script.outputs.build_date_numeric}}.${{steps.script.outputs.commit_hash}}            
+            ${{steps.script.outputs.git_url}}/${{steps.script.outputs.git_repo}}:${{steps.script.outputs.commit_hash}}            
          #   docker.io/${{steps.script.outputs.docker_repo}}:latest
          #   quay.io/${{steps.script.outputs.redhat_quay_repo}}:latest
          # outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=My multi-arch image
