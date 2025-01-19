@@ -1,6 +1,6 @@
 # docker build --no-cache --progress=plain -t local/example:distroless -f distroless.debian.Dockerfile .
 
-# hadolint ignore=DL3006,DL3007
+# hadolint ignore=DL3007
 FROM golang:latest AS builder
 
 ENV CGO_ENABLED=0
@@ -64,6 +64,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # List of packages for download separated by spaces.
 ENV PACKAGE_LIST="curl netcat-openbsd"
 
+# hadolint ignore=DL3008,DL3015,SC2086
 RUN \
     #echo "deb http://deb.debian.org/debian bookworm-backports main" >> /etc/apt/sources.list && \
     apt-get update && \
@@ -101,7 +102,7 @@ RUN tree /dpkg
 
 
 # We want latest at time of build
-# hadolint ignore=DL3006,DL3007
+# hadolint ignore=DL3007
 FROM gcr.io/distroless/static-debian12:latest AS production
 
 ARG VCS_REF
@@ -131,6 +132,7 @@ COPY --from=deb-extractor /dpkg /
 COPY --from=builder --chown=nobody:nogroup /go/app/webserver /app/webserver
 
 # Copy HEALTHCHECK <https://github.com/Tob1as/docker-healthcheck>
+# hadolint ignore=DL3022
 #COPY --from=docker.io/tobi312/tools:healthcheck --chown=nobody:nogroup /usr/local/bin/healthcheck /usr/local/bin/healthcheck
 
 USER nobody

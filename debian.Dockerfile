@@ -1,6 +1,6 @@
 # docker build --no-cache --progress=plain -t local/example:debian -f debian.Dockerfile .
 
-# hadolint ignore=DL3006,DL3007
+# hadolint ignore=DL3007
 FROM golang:latest AS builder
 
 ENV CGO_ENABLED=0
@@ -51,7 +51,7 @@ RUN \
 
 
 
-# hadolint ignore=DL3006,DL3007
+# hadolint ignore=DL3007
 FROM debian:latest AS production
 
 ARG VCS_REF
@@ -76,6 +76,7 @@ LABEL org.opencontainers.image.title="" \
 ENV PORT=8080
 #ENV HEALTHCHECK_PORT=8080
 
+# hadolint ignore=DL3008
 RUN set -eux ; \
     apt-get update ; \
     apt-get install -y --no-install-recommends \
@@ -89,6 +90,7 @@ RUN set -eux ; \
 COPY --from=builder --chown=nobody:nogroup /go/app/webserver /app/webserver
 
 # Copy HEALTHCHECK <https://github.com/Tob1as/docker-healthcheck>
+# hadolint ignore=DL3022
 #COPY --from=docker.io/tobi312/tools:healthcheck --chown=nobody:nogroup /usr/local/bin/healthcheck /usr/local/bin/healthcheck
 
 USER nobody
