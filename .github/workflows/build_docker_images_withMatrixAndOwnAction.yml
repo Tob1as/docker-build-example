@@ -143,6 +143,7 @@ jobs:
           tags: |
             ${{env.GIT_URL}}/${{env.GIT_REPO}}:${{env.PHP_VERSION}}
           #  docker.io/${{env.DOCKER_REPO}}:${{env.PHP_VERSION}}
+          #  quay.io/${{env.QUAY_REPO}}:${{env.PHP_VERSION}}
 
 
   # --------------------------------------------------
