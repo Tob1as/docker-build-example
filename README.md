@@ -55,7 +55,8 @@ Actions:
 
 ## GitLab 
 
-For GitLab use the `.gitlab-ci.yml` as an example.
+For [GitLab](https://about.gitlab.com/) use the `.gitlab-ci.yml` as an example.  
+More see in [Docs](https://docs.gitlab.com/topics/build_your_application/).
 
 ## Docker Hub Hook
 
@@ -78,13 +79,26 @@ Example for advanced options (hooks) and buildx for Autobuild on Docker Hub to b
 └── ... more Dockerfiles
 ```
 
+## Dockerfile(s)
+
+```
+.
+├── alpine.Dockerfile
+├── debian.Dockerfile
+├── distroless.debian.Dockerfile
+└── scratch.Dockerfile
+```
+
+This examples creates a (simple) Go application. It uses multistages and different runtime containers (with and without shell).  
+For more examples see in my other Repositories!
+
 ## more Docs
 * [Docker Build](https://docs.docker.com/build/)
 * [Building Multi-Architecture Docker Images With Buildx](https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with-buildx-27d80f7e2408)
 * https://github.com/multiarch/qemu-user-static & https://github.com/tonistiigi/binfmt
 
 
-## Example Repository
+## Example Repositories
 
 More examples can be found in my repositories. Here is a selection:
 
