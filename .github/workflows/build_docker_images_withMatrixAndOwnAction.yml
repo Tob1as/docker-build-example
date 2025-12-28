@@ -141,8 +141,8 @@ jobs:
             BUILD_DATE=${{ env.BUILD_DATE }}
             VCS_REF=${{ env.COMMIT_HASH }}
           tags: |
-            docker.io/${{env.DOCKER_REPO}}:${{env.PHP_VERSION}}
-          #  ${{env.GIT_URL}}/${{env.GIT_REPO}}:${{env.PHP_VERSION}}
+            ${{env.GIT_URL}}/${{env.GIT_REPO}}:${{env.PHP_VERSION}}
+          #  docker.io/${{env.DOCKER_REPO}}:${{env.PHP_VERSION}}
 
 
   # --------------------------------------------------
@@ -175,8 +175,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build php
+      - name: Execute Docker Setup
+        id: docker-setup
         run: |
+          echo "here you must call the action"
+
+      - name: Build
+        run: |
+          echo "here you must call the action for ..."
           echo "Building php:${PHP_VERSION}"
 
 
@@ -211,8 +217,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build php extended
+      - name: Execute Docker Setup
+        id: docker-setup
         run: |
+          echo "here you must call the action"
+
+      - name: Build
+        run: |
+          echo "here you must call the action for ..."
           echo "Building php-extended:${PHP_VERSION}"
 
 
@@ -246,6 +258,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build php-wsc
+      - name: Execute Docker Setup
+        id: docker-setup
         run: |
+          echo "here you must call the action"
+
+      - name: Build
+        run: |
+          echo "here you must call the action for ..."
           echo "Building php-wsc:${PHP_VERSION}"
