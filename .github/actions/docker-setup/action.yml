@@ -1,5 +1,5 @@
 # .github/actions/docker-setup/action.yml
-name: Docker Setup
+name: 'Docker setup [EXPANDED]'
 description: Docker Setup (install, qemu, buildx and login)
 
 inputs:
