@@ -50,7 +50,7 @@ Actions:
     uses: ./.github/actions/docker-setup
     ```
   * `.github/workflows/build_docker_images_withMatrixAndOwnAction.yml` Workflow-File with Matrix and use own Action. 
-  * It is used (in future / from 2026) in my GitHub Repository: [docker-php](https://github.com/Tob1as/docker-php)
+  * It is used in my GitHub Repository: [docker-php](https://github.com/Tob1as/docker-php)
   
 
 ## GitLab 
