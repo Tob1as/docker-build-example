@@ -10,7 +10,10 @@ Here are a few examples:
 Docs:
 * https://github.com/features/actions
 * https://docs.github.com/en/actions
-  * https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets
+  * create repository variables and secrets:
+    * https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-variables
+    * https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets
+  * set Workflow Permission: Settings -> Action -> General and then under Workflow permissions: Read and write permissions
   * https://docs.github.com/en/actions/tutorials/create-actions/create-a-composite-action
 
 Actions:
