@@ -48,6 +48,7 @@ Actions:
     ```yaml
     uses: tob1as/docker-build-example/.github/actions/docker-setup@main
     ```
+    (Note: You can also use the full commit SHA if you don't want to use `main`.)  
     or when you copy the action:
     ```yaml
     uses: ./.github/actions/docker-setup
