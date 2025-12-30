@@ -74,7 +74,8 @@ runs:
       #  config-inline: |
       #    [registry."${{ env.GIT_URL }}"]
       #      #insecure = true
-      #      ca=["/etc/ssl/certs/ca-certificates.crt"]       
+      #      #ca=["/etc/ssl/certs/ca-certificates.crt"]
+      #      ca=["/etc/ssl/certs/fullca.crt"] 
 
     - name: Login to GIT Container Registry
       if: env.GIT_URL != '' && github.repository_owner != '' && inputs.github_token != ''
