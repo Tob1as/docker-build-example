@@ -115,11 +115,11 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          config-inline: |
-            [registry."${{steps.script.outputs.git_url}}"]
-              #insecure = true
-              ca=["/etc/ssl/certs/ca-certificates.crt"]            
+        #with:
+        #  buildkitd-config-inline: |
+        #    [registry."${{steps.script.outputs.git_url}}"]
+        #      #insecure = true
+        #      ca=["/etc/ssl/certs/ca-chain.crt"]            
 
       - name: Login to GIT Container Registry
         uses: docker/login-action@v3
