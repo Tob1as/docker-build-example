@@ -4,7 +4,7 @@ description: Docker Setup (install, qemu, buildx and login)
 
 inputs:
   git_url:
-    description: "Git-URL from Workflow"
+    description: "Git-URL/Registry-Domain from Workflow"
     required: false
     #default: 'ghcr.io'
   git_username:
