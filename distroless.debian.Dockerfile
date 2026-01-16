@@ -53,7 +53,7 @@ RUN \
 
 # Simple example of how to properly extract packages for reuse in distroless
 # Taken from: https://github.com/GoogleContainerTools/distroless/issues/863#issuecomment-986062361
-# and: https://github.com/fluent/fluent-bit/blob/master/dockerfiles/Dockerfile#L100-L159
+# and: https://github.com/fluent/fluent-bit/blob/master/dockerfiles/Dockerfile#L125-L181
 FROM debian:bookworm-slim AS deb-extractor
 
 # We download all debs locally then extract them into a directory we can use as the root for distroless.
