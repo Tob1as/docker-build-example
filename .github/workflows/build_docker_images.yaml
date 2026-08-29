@@ -29,6 +29,16 @@ on:
   #schedule:
   #  - cron: '30 5 28 * *'  # At 05:30 on day-of-month 28.
 
+# Permissions required by the GitHub Container Registry deployment actions.
+permissions:
+  contents: read
+  packages: write
+
+# Only one deployment at a time; newer pushes cancel in-progress runs.
+#concurrency:
+#  group: docker-images
+#  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
