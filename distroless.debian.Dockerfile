@@ -1,4 +1,13 @@
-# docker build --no-cache --progress=plain -t local/example:distroless -f distroless.debian.Dockerfile .
+# docker build --no-cache --progress=plain --target=production -t local/example:distroless -f distroless.debian.Dockerfile .
+
+# ============================================================================
+# Using Google Distroless as image for a simple Go Webserver (example)
+# https://github.com/googlecontainertools/distroless
+# ============================================================================
+
+# ============================================================================
+# Stage 1: Build the simple Go Webserver (example)
+# ============================================================================
 
 # hadolint ignore=DL3007
 FROM golang:latest AS builder
@@ -49,12 +58,14 @@ RUN \
     go build -o webserver . ; \
     echo "Build done !"
 
-
+# ============================================================================
+# Stage 2: Extract required packages for distroless
+# ============================================================================
 
 # Simple example of how to properly extract packages for reuse in distroless
 # Taken from: https://github.com/GoogleContainerTools/distroless/issues/863#issuecomment-986062361
-# and: https://github.com/fluent/fluent-bit/blob/master/dockerfiles/Dockerfile#L125-L181
-FROM debian:bookworm-slim AS deb-extractor
+# and: https://github.com/fluent/fluent-bit/blob/master/dockerfiles/Dockerfile#L125-L183
+FROM debian:trixie-slim AS deb-extractor
 
 # We download all debs locally then extract them into a directory we can use as the root for distroless.
 # We also include some extra handling for the status files that some tooling uses for scanning, etc.
@@ -64,23 +75,18 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # List of packages for download separated by spaces.
 ENV PACKAGE_LIST="curl netcat-openbsd"
 
-# hadolint ignore=DL3008,DL3015,SC2086
+# DL3008 (pin package versions) is intentionally ignored (throwaway build stage).
+# hadolint ignore=DL3008
 RUN \
-    #echo "deb http://deb.debian.org/debian bookworm-backports main" >> /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y apt-rdepends tree && \
-    # Search subpackages for package (apt-rdepends PACKAGE | grep -v "^ " | sort -u | tr '\n' ' ')
-    packages=$(for package in $PACKAGE_LIST; do \
-        apt-rdepends $package 2>/dev/null | \
-        grep -v "^ " | \
-        grep -v "^PreDepends:" | \
-        sort -u; \
-    done | sort -u) && \
-    #packages=$PACKAGE_LIST ; \
-    # Download packages
-    echo ">> Packages to Download: $(echo $packages | tr '\n' ' ')" && \
-    apt-get download \
-        $packages \
+    apt-get install -y --no-install-recommends apt-rdepends tree && \
+    # Option 1: download only the packages listed in PACKAGE_LIST
+    #packages="${PACKAGE_LIST}" && \
+    # Option 2: also resolve all (recursive) dependencies via apt-rdepends.
+    packages=$(echo "${PACKAGE_LIST}" | xargs apt-rdepends 2>/dev/null | grep -v "^ " | grep -v "^PreDepends:" | sort -u) && \
+    # Download packages (xargs splits the list, avoids unquoted word splitting, SC2086)
+    echo ">> Packages to Download: $(echo "${packages}" | tr '\n' ' ')" && \
+    echo "${packages}" | xargs apt-get download \
     && \
     mkdir -p /dpkg/var/lib/dpkg/status.d/ && \
     for deb in *.deb; do \
@@ -93,17 +99,46 @@ RUN \
     echo "Packages have been processed !"
 
 # Remove unnecessary files extracted from deb packages like man pages and docs etc.
-RUN find /dpkg/ -type d -empty -delete && \
-    rm -r /dpkg/usr/share/doc/
+RUN rm -rf /dpkg/usr/share/doc/ /dpkg/usr/share/man/ && \
+    find /dpkg/ -type d -empty -delete
 
 # List directory and file structure
 RUN tree /dpkg
 
 
+# ============================================================================
+# Stage 3a: Debug image with distroless
+# Select with: --target debug
+# ============================================================================
 
-# We want latest at time of build
-# hadolint ignore=DL3007
-FROM gcr.io/distroless/static-debian12:latest AS production
+FROM gcr.io/distroless/static-debian13:debug-nonroot AS debug
+
+ARG VCS_REF
+ARG BUILD_DATE
+ARG VERSION
+
+LABEL org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.source="https://github.com/Tob1as/docker-build-example"
+
+ENV PORT=8080
+COPY --from=deb-extractor /dpkg /
+COPY --from=builder --chown=65532:65532 /go/app/webserver /app/webserver
+
+# User nonroot
+#USER 65532
+
+EXPOSE 8080/tcp
+ENTRYPOINT ["/app/webserver"]
+CMD ["--text=Nothing to see here!"]
+
+# ============================================================================
+# Stage 3b: Production image with distroless
+# Select with: --target production
+# ============================================================================
+
+FROM gcr.io/distroless/static-debian13:nonroot AS production
 
 ARG VCS_REF
 ARG BUILD_DATE
@@ -117,7 +152,7 @@ LABEL org.opencontainers.image.title="" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.description="" \
       org.opencontainers.image.documentation="https://github.com/GoogleContainerTools/distroless" \
-      org.opencontainers.image.base.name="gcr.io/distroless/static-debian12" \
+      org.opencontainers.image.base.name="gcr.io/distroless/static-debian13" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.url="" \
       org.opencontainers.image.source="https://github.com/Tob1as/docker-build-example"
@@ -129,13 +164,13 @@ ENV PORT=8080
 COPY --from=deb-extractor /dpkg /
 
 # Copy files from your build
-COPY --from=builder --chown=nobody:nogroup /go/app/webserver /app/webserver
+COPY --from=builder --chown=65532:65532 /go/app/webserver /app/webserver
 
 # Copy HEALTHCHECK <https://github.com/Tob1as/docker-healthcheck>
-# hadolint ignore=DL3022
-#COPY --from=docker.io/tobi312/tools:healthcheck --chown=nobody:nogroup /usr/local/bin/healthcheck /usr/local/bin/healthcheck
+#COPY --from=docker.io/tobi312/tools:healthcheck --chown=65532:65532 /usr/local/bin/healthcheck /usr/local/bin/healthcheck
 
-USER nobody
+# User nonroot (ID: 65532)
+#USER 65532
 
 EXPOSE 8080/tcp
 ENTRYPOINT ["/app/webserver"]
